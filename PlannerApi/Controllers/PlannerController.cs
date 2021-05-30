@@ -24,7 +24,7 @@
             var responseContent = await response.Content.ReadAsStringAsync();
 
             var responseObject = JObject.Parse(responseContent);
-            var responseObjectValues = responseObject.SelectToken("values");//select
+            var responseObjectValues = responseObject.SelectToken("values");
 
             return responseObjectValues.ToString();
         }
