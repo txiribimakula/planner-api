@@ -4,11 +4,11 @@
     {
         public string Title { get; set; }
 
-        public int Value { get; set; }
+        public int Index { get; set; }
 
-        public Plan(string title, int value = 0) {
+        public Plan(string title, int index) {
             Title = title;
-            Value = value;
+            Index = index;
         }
     }
 }
