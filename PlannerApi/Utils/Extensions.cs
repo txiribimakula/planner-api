@@ -19,11 +19,11 @@ namespace PlannerApi.Utils
                 longPlans.Add(new Plan(planName, Convert.ToInt32(row.Values[0][3])));
             }
 
-            IEnumerable<IEnumerable<Plan>> listOfPlans = new List<IEnumerable<Plan>>() {
+            IEnumerable<IEnumerable<Plan>> listsOfPlans = new List<IEnumerable<Plan>>() {
                 plans, shortPlans, midPlans, longPlans
             };
 
-            return listOfPlans;
+            return listsOfPlans;
         }
     }
 }
