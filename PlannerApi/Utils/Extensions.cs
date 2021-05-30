@@ -13,7 +13,7 @@ namespace PlannerApi.Utils
             List<Plan> longPlans = new List<Plan>();
             foreach (var row in workbookTableRowsResponse.Rows) {
                 string planName = row.Values[0][0].ToString();
-                plans.Add(new Plan(planName));
+                plans.Add(new Plan(planName, row.Index));
                 shortPlans.Add(new Plan(planName, Convert.ToInt32(row.Values[0][1])));
                 midPlans.Add(new Plan(planName, Convert.ToInt32(row.Values[0][2])));
                 longPlans.Add(new Plan(planName, Convert.ToInt32(row.Values[0][3])));
