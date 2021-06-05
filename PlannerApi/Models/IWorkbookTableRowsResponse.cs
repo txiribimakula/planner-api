@@ -11,7 +11,7 @@
     public class Value
     {
         [JsonProperty("index")]
-        public int Index { get; set; }
+        public int? Index { get; set; }
 
         [JsonProperty("values")]
         public object[][] Values { get; set; }

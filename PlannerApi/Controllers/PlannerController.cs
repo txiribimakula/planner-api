@@ -1,7 +1,6 @@
 ﻿namespace PlannerApi.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Graph;
     using Newtonsoft.Json;
     using PlannerApi.Models;
     using PlannerApi.Utils;
@@ -38,14 +37,32 @@
 
             var requestContent = new StringContent(JsonConvert.SerializeObject(
                 new Value() {
-                    Index = plan.Index,
+                    Index = null,
                     Values = new object[][] {
-                    new object[] { plan.Title, plan.Index, null, null},
+                        new object[] { null, null, null, null },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
+                        new object[] { "title", 4, 3, 3 },
                     }
                 }
             ));
+            var response1 = await client.GetAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/range/visibleView");
 
-            return await client.PatchAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={plan.Index})", requestContent);
+            var somethhign = response1.Content.ReadAsStringAsync();
+
+            var response = await client.PatchAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/range", requestContent);
+            somethhign = response.Content.ReadAsStringAsync();
+
+            return response;
         }
     }
 }
