@@ -6,7 +6,7 @@ namespace PlannerApi.Utils
 {
     public static class Extensions
     {
-        public static IEnumerable<IEnumerable<Plan>> GetPlans(this WorkbookTableRowsResponse workbookTableRowsResponse) {
+        public static Plan[][] GetPlans(this WorkbookTableRowsResponse workbookTableRowsResponse) {
             List<Plan> plans = new List<Plan>();
             List<Plan> shortPlans = new List<Plan>();
             List<Plan> midPlans = new List<Plan>();
@@ -22,8 +22,8 @@ namespace PlannerApi.Utils
                 longPlans.Add(new Plan(planName, Convert.ToInt32(row.Values[0][3])));
             }
 
-            IEnumerable<IEnumerable<Plan>> listsOfPlans = new List<IEnumerable<Plan>>() {
-                plans, shortPlans, midPlans, longPlans
+            Plan[][] listsOfPlans = new Plan[][] {
+                plans.ToArray(), shortPlans.ToArray(), midPlans.ToArray(), longPlans.ToArray()
             };
 
             return listsOfPlans;
