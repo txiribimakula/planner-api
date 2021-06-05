@@ -31,7 +31,7 @@
         }
 
         [HttpPost("plans")]
-        public async Task<HttpResponseMessage> UpdatePlans(Plan[] plans) {
+        public async Task<Plan[][]> UpdatePlans(Plan[] plans) {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(baseAddress);
             client.DefaultRequestHeaders.Authorization = Auth.GetAuthHeader(Request.Headers);
@@ -66,9 +66,13 @@
                 var postRequestContent = new StringContent(serialized);
                 var postResponse = await client.PostAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/add", postRequestContent);
                 var postResponseContent = await postResponse.Content.ReadAsStringAsync();
-            }
 
-            return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                WorkbookTableRowsResponse rowsResponse = JsonConvert.DeserializeObject<WorkbookTableRowsResponse>(postResponseContent);
+
+                return rowsResponse.GetPlans();
+            } else {
+                return await GetPlans();
+            }
         }
     }
 }
