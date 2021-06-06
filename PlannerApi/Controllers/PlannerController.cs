@@ -39,16 +39,12 @@
             var currentPlans = (await GetPlans()).ElementAt(0);
 
             List<int> indexesToDelete = new List<int>();
-            for (int i = 0; i < currentPlans.Length; i++) {
+            for (int i = currentPlans.Length - 1; i >= 0; i--) {
                 int index = Array.FindIndex(plans[0], plan => plan.Title == currentPlans[i].Title);
                 if (index == -1) {
-                    indexesToDelete.Add(i);
+                    await client.DeleteAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={indexesToDelete[i]})");
                 }
             }
-            for (int i = indexesToDelete.Count() - 1; i >= 0; i--) {
-                await client.DeleteAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={indexesToDelete[i]})");
-            }
-
 
             List<Plan> plansToPost = new List<Plan>();
             foreach (var plan in plans[0]) {
