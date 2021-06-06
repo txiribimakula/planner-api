@@ -38,11 +38,10 @@
 
             var currentPlans = (await GetPlans()).ElementAt(0);
 
-            List<int> indexesToDelete = new List<int>();
             for (int i = currentPlans.Length - 1; i >= 0; i--) {
                 int index = Array.FindIndex(plans[0], plan => plan.Title == currentPlans[i].Title);
                 if (index == -1) {
-                    await client.DeleteAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={indexesToDelete[i]})");
+                    await client.DeleteAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={index})");
                 }
             }
 
@@ -70,6 +69,8 @@
 
                 WorkbookTableRowsResponse rowsResponse = JsonConvert.DeserializeObject<WorkbookTableRowsResponse>(postResponseContent);
             }
+
+
 
             return await GetPlans();
         }
