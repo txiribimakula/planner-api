@@ -31,7 +31,7 @@
         }
 
         [HttpPost("plans")]
-        public async Task<HttpResponseMessage> UpdatePlans(Plan[] plans) {
+        public async Task<Plan[][]> UpdatePlans(Plan[][] plans) {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(baseAddress);
             client.DefaultRequestHeaders.Authorization = Auth.GetAuthHeader(Request.Headers);
@@ -40,7 +40,7 @@
 
             List<int> indexesToDelete = new List<int>();
             for (int i = 0; i < currentPlans.Length; i++) {
-                int index = Array.FindIndex(plans, plan => plan.Title == currentPlans[i].Title);
+                int index = Array.FindIndex(plans[0], plan => plan.Title == currentPlans[i].Title);
                 if (index == -1) {
                     indexesToDelete.Add(i);
                 }
@@ -51,7 +51,7 @@
 
 
             List<Plan> plansToPost = new List<Plan>();
-            foreach (var plan in plans) {
+            foreach (var plan in plans[0]) {
                 int index = Array.FindIndex(currentPlans, currentPlan => currentPlan.Title == plan.Title);
                 if (index == -1) {
                     plansToPost.Add(plan);
@@ -60,7 +60,12 @@
             if(plansToPost.Count() > 0) {
                 var serialized = JsonConvert.SerializeObject(
                     new Value() {
-                        Values = plansToPost.Select(plan => new object[] { plan.Title, 0, 0, 0 }).ToArray()
+                        Values = plansToPost.Select(plan => new object[] {
+                            plan.Title,
+                            Array.Find(plans[1], shortPlan => shortPlan.Title == plan.Title).Index,
+                            Array.Find(plans[2], midPlan => midPlan.Title == plan.Title).Index,
+                            Array.Find(plans[3], longPlan => longPlan.Title == plan.Title).Index
+                        }).ToArray()
                     }
                 );
                 var postRequestContent = new StringContent(serialized);
@@ -70,7 +75,7 @@
                 WorkbookTableRowsResponse rowsResponse = JsonConvert.DeserializeObject<WorkbookTableRowsResponse>(postResponseContent);
             }
 
-            return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            return await GetPlans();
         }
     }
 }
