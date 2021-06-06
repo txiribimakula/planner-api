@@ -32,6 +32,8 @@
 
         [HttpPost("plans")]
         public async Task<Plan[][]> UpdatePlans(Plan[][] plans) {
+            bool isAnythingPostedOrDeleted = false;
+
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(baseAddress);
             client.DefaultRequestHeaders.Authorization = Auth.GetAuthHeader(Request.Headers);
@@ -42,6 +44,7 @@
                 int index = Array.FindIndex(plans[0], plan => plan.Title == currentPlans[i].Title);
                 if (index == -1) {
                     await client.DeleteAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={index})");
+                    isAnythingPostedOrDeleted = true;
                 }
             }
 
@@ -50,6 +53,7 @@
                 int index = Array.FindIndex(currentPlans, currentPlan => currentPlan.Title == plan.Title);
                 if (index == -1) {
                     plansToPost.Add(plan);
+                    isAnythingPostedOrDeleted = true;
                 }
             }
             if(plansToPost.Count() > 0) {
@@ -70,7 +74,23 @@
                 WorkbookTableRowsResponse rowsResponse = JsonConvert.DeserializeObject<WorkbookTableRowsResponse>(postResponseContent);
             }
 
-
+            if (!isAnythingPostedOrDeleted) {
+                for (int i = 0; i < plans[0].Length; i++) {
+                    var serialized = JsonConvert.SerializeObject(
+                    new Value() {
+                        Values = new object[][] {
+                            new object [] {
+                                plans[0][i].Title,
+                                Array.Find(plans[1], shortPlan => shortPlan.Title == plans[0][i].Title).Index,
+                                Array.Find(plans[2], midPlan => midPlan.Title == plans[0][i].Title).Index,
+                                Array.Find(plans[3], longPlan => longPlan.Title == plans[0][i].Title).Index
+                            }
+                        }
+                    });
+                    var patchRequestContent = new StringContent(serialized);
+                    await client.PatchAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={i})", patchRequestContent);
+                }
+            }
 
             return await GetPlans();
         }
