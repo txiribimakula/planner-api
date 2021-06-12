@@ -10,5 +10,14 @@
             Title = title;
             Index = index;
         }
+
+        public override bool Equals(object obj) {
+            Plan planToCompare = (Plan)obj;
+            return this.Title == planToCompare.Title && this.Index == planToCompare.Index;
+        }
+
+        public override int GetHashCode() {
+            return this.Title.GetHashCode() + this.Index.GetHashCode();
+        }
     }
 }

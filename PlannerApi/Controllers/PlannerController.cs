@@ -38,7 +38,8 @@
             client.BaseAddress = new Uri(baseAddress);
             client.DefaultRequestHeaders.Authorization = Auth.GetAuthHeader(Request.Headers);
 
-            var currentPlans = (await GetPlans()).ElementAt(0);
+            var currentListsOfPlans = await GetPlans();
+            var currentPlans = currentListsOfPlans.ElementAt(0);
 
             for (int i = currentPlans.Length - 1; i >= 0; i--) {
                 int index = Array.FindIndex(plans[0], plan => plan.Title == currentPlans[i].Title);
@@ -76,23 +77,40 @@
 
             if (!isAnythingPostedOrDeleted) {
                 for (int i = 0; i < plans[0].Length; i++) {
-                    var serialized = JsonConvert.SerializeObject(
-                    new Value() {
-                        Values = new object[][] {
+                    if(!plans[0][i].Equals(currentListsOfPlans[0][i])
+                        || !Array.Find(plans[1], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[1][i])
+                        || !Array.Find(plans[2], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[2][i])
+                        || !Array.Find(plans[3], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[3][i])) {
+                        var serialized = JsonConvert.SerializeObject(
+                        new Value() {
+                            Values = new object[][] {
                             new object [] {
                                 plans[0][i].Title,
                                 Array.Find(plans[1], shortPlan => shortPlan.Title == plans[0][i].Title).Index,
                                 Array.Find(plans[2], midPlan => midPlan.Title == plans[0][i].Title).Index,
                                 Array.Find(plans[3], longPlan => longPlan.Title == plans[0][i].Title).Index
                             }
-                        }
-                    });
-                    var patchRequestContent = new StringContent(serialized);
-                    await client.PatchAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={i})", patchRequestContent);
+                            }
+                        });
+                        var patchRequestContent = new StringContent(serialized);
+                        await client.PatchAsync($"drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows/$/ItemAt(index={i})", patchRequestContent);
+                    }
                 }
             }
 
             return await GetPlans();
+        }
+
+        [HttpGet("events")]
+        public async Task<HttpResponseMessage> GetEvents() {
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri(baseAddress);
+            client.DefaultRequestHeaders.Authorization = Auth.GetAuthHeader(Request.Headers);
+
+            var response = await client.GetAsync("calendar/events");
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            return new HttpResponseMessage();
         }
     }
 }
