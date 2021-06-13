@@ -44,16 +44,12 @@ namespace PlannerApi
 
             services.AddScoped(provider => {
                 var headers = provider.GetService<IHttpContextAccessor>()?.HttpContext?.Request?.Headers;
-                IAuthenticationProvider authProvider = null;
-                if(headers != null) {
-                    authProvider = new AuthenticationProvider(Auth.GetAuthHeader(headers));
-                }
-                 return new GraphServiceClient(authProvider);
+                return new GraphServiceClient(headers != null ? new AuthenticationProvider(Auth.GetAuthHeader(headers)) : null);
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, GraphServiceClient graphServiceClient, IHttpContextAccessor httpContextAccessor) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
