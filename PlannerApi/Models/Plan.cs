@@ -6,6 +6,8 @@
 
         public int Index { get; set; }
 
+        public int Value { get => (3 - Index) < 0 ? 0 : (3 - Index); }
+
         public Plan(string title, int index) {
             Title = title;
             Index = index;
