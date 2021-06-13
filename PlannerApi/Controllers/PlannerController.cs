@@ -15,11 +15,14 @@
     [ApiController]
     public class PlannerController : ControllerBase
     {
+        private readonly string FileId = "EB4D21CF97FBA497!11746";
+        private readonly string PlansTableName = "plans";
+
         [HttpGet("plans")]
         public async Task<Plan[][]> GetPlans() {
             GraphServiceClient graphClient = new GraphServiceClient(new AuthenticationProvider(Auth.GetAuthHeader(Request.Headers)));
 
-            var plansResponse = await graphClient.Me.Drive.Items["EB4D21CF97FBA497!11746"].Workbook.Tables["plans"].Rows
+            var plansResponse = await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows
                 .Request()
                 .GetAsync();
 
@@ -38,7 +41,7 @@
             for (int i = currentPlans.Length - 1; i >= 0; i--) {
                 int index = Array.FindIndex(plans[0], plan => plan.Title == currentPlans[i].Title);
                 if (index == -1) {
-                    await graphClient.Me.Drive.Items["EB4D21CF97FBA497!11746"].Workbook.Tables["plans"].Rows[$"ItemAt(index={i})"]
+                    await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows[$"ItemAt(index={i})"]
                         .Request()
                         .DeleteAsync();
                     isAnythingPostedOrDeleted = true;
@@ -61,7 +64,7 @@
                     Array.Find(plans[3], longPlan => longPlan.Title == plan.Title).Index
                 }));
 
-                var postResponse = await graphClient.Me.Drive.Items["EB4D21CF97FBA497!11746"].Workbook.Tables["plans"].Rows
+                var postResponse = await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows
                     .Add(null, values)
                     .Request()
                     .PostAsync();
@@ -84,7 +87,7 @@
                             }
                         );
 
-                        await graphClient.Me.Drive.Items["EB4D21CF97FBA497!11746"].Workbook.Tables["plans"].Rows[$"ItemAt(index={i})"]
+                        await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows[$"ItemAt(index={i})"]
                             .Request()
                             .UpdateAsync(new WorkbookTableRow() { Values = values });
                     }
