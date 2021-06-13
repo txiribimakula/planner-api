@@ -1,6 +1,7 @@
 ﻿namespace PlannerApi.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Graph;
     using Newtonsoft.Json;
     using PlannerApi.Models;
     using PlannerApi.Utils;
@@ -57,7 +58,7 @@
                     isAnythingPostedOrDeleted = true;
                 }
             }
-            if(plansToPost.Count() > 0) {
+            if (plansToPost.Count() > 0) {
                 var serialized = JsonConvert.SerializeObject(
                     new Value() {
                         Values = plansToPost.Select(plan => new object[] {
@@ -77,7 +78,7 @@
 
             if (!isAnythingPostedOrDeleted) {
                 for (int i = 0; i < plans[0].Length; i++) {
-                    if(!plans[0][i].Equals(currentListsOfPlans[0][i])
+                    if (!plans[0][i].Equals(currentListsOfPlans[0][i])
                         || !Array.Find(plans[1], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[1][i])
                         || !Array.Find(plans[2], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[2][i])
                         || !Array.Find(plans[3], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[3][i])) {
@@ -103,12 +104,11 @@
 
         [HttpGet("events")]
         public async Task<HttpResponseMessage> GetEvents() {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(baseAddress);
-            client.DefaultRequestHeaders.Authorization = Auth.GetAuthHeader(Request.Headers);
+            GraphServiceClient graphClient = new GraphServiceClient(new AuthenticationProvider(Auth.GetAuthHeader(Request.Headers)));
 
-            var response = await client.GetAsync("calendar/events");
-            var responseContent = await response.Content.ReadAsStringAsync();
+            var events = await graphClient.Me.Events
+                .Request()
+                .GetAsync();
 
             return new HttpResponseMessage();
         }
