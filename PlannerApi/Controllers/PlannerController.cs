@@ -100,12 +100,12 @@
         }
 
         [HttpGet("events")]
-        public async Task<HttpResponseMessage> GetEvents() {
-            var events = await GraphServiceClient.Me.Events
+        public async Task<IEnumerable<Models.Event>> GetEvents() {
+            var eventsResponse = await GraphServiceClient.Me.Events
                 .Request()
                 .GetAsync();
 
-            return new HttpResponseMessage();
+            return eventsResponse.GetEvents();
         }
     }
 }

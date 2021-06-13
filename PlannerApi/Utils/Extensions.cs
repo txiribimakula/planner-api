@@ -2,6 +2,7 @@
 using PlannerApi.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PlannerApi.Utils
 {
@@ -14,7 +15,7 @@ namespace PlannerApi.Utils
             List<Plan> longPlans = new List<Plan>();
             foreach (var row in workbookTableRowsResponse) {
                 string planName = row.Values[0][0].ToString();
-                if(string.IsNullOrEmpty(planName)) {
+                if (string.IsNullOrEmpty(planName)) {
                     break;
                 }
                 plans.Add(new Plan(planName, row.Index.Value));
@@ -28,6 +29,32 @@ namespace PlannerApi.Utils
             };
 
             return listsOfPlans;
+        }
+
+        public static IEnumerable<Models.Event> GetEvents(this IUserEventsCollectionPage userEventsCollectionPage) {
+            var events = new List<Models.Event>();
+
+            foreach (var item in userEventsCollectionPage) {
+                events.Add(new Models.Event() {
+                    Id = item.Id,
+                    Title = item.Subject,
+                    PlanTitle = item.Categories.Count() > 0 ? item.Categories.ElementAt(0) : null,
+                    StartDate = item.Start.DateTime.GetDateTime(),
+                    EndDate = item.End.DateTime.GetDateTime()
+                });
+            }
+
+            return events;
+        }
+
+        public static DateTime GetDateTime(this string dateTimeText) {
+            var startDateTime = dateTimeText.Split('T');
+            var startDate = startDateTime[0];
+            var startDateSplitted = startDate.Split('-');
+            var startTime = startDateTime[1];
+            var startTimeSplitted = startTime.Split(':');
+
+            return new DateTime(int.Parse(startDateSplitted[0]), int.Parse(startDateSplitted[1]), int.Parse(startDateSplitted[2]), int.Parse(startTimeSplitted[0]), int.Parse(startTimeSplitted[1]), 0);
         }
     }
 }
