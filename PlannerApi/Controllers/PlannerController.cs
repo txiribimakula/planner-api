@@ -18,11 +18,15 @@
         private readonly string FileId = "EB4D21CF97FBA497!11746";
         private readonly string PlansTableName = "plans";
 
+        public GraphServiceClient GraphServiceClient { get; set; }
+
+        public PlannerController(GraphServiceClient graphServiceClient) {
+            GraphServiceClient = graphServiceClient;
+        }
+
         [HttpGet("plans")]
         public async Task<Plan[][]> GetPlans() {
-            GraphServiceClient graphClient = new GraphServiceClient(new AuthenticationProvider(Auth.GetAuthHeader(Request.Headers)));
-
-            var plansResponse = await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows
+            var plansResponse = await GraphServiceClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows
                 .Request()
                 .GetAsync();
 
@@ -33,15 +37,13 @@
         public async Task<Plan[][]> UpdatePlans(Plan[][] plans) {
             bool isAnythingPostedOrDeleted = false;
 
-            GraphServiceClient graphClient = new GraphServiceClient(new AuthenticationProvider(Auth.GetAuthHeader(Request.Headers)));
-
             var currentListsOfPlans = await GetPlans();
             var currentPlans = currentListsOfPlans.ElementAt(0);
 
             for (int i = currentPlans.Length - 1; i >= 0; i--) {
                 int index = Array.FindIndex(plans[0], plan => plan.Title == currentPlans[i].Title);
                 if (index == -1) {
-                    await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows[$"ItemAt(index={i})"]
+                    await GraphServiceClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows[$"ItemAt(index={i})"]
                         .Request()
                         .DeleteAsync();
                     isAnythingPostedOrDeleted = true;
@@ -64,7 +66,7 @@
                     Array.Find(plans[3], longPlan => longPlan.Title == plan.Title).Index
                 }));
 
-                var postResponse = await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows
+                var postResponse = await GraphServiceClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows
                     .Add(null, values)
                     .Request()
                     .PostAsync();
@@ -87,7 +89,7 @@
                             }
                         );
 
-                        await graphClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows[$"ItemAt(index={i})"]
+                        await GraphServiceClient.Me.Drive.Items[FileId].Workbook.Tables[PlansTableName].Rows[$"ItemAt(index={i})"]
                             .Request()
                             .UpdateAsync(new WorkbookTableRow() { Values = values });
                     }
@@ -99,9 +101,7 @@
 
         [HttpGet("events")]
         public async Task<HttpResponseMessage> GetEvents() {
-            GraphServiceClient graphClient = new GraphServiceClient(new AuthenticationProvider(Auth.GetAuthHeader(Request.Headers)));
-
-            var events = await graphClient.Me.Events
+            var events = await GraphServiceClient.Me.Events
                 .Request()
                 .GetAsync();
 
