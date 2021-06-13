@@ -1,4 +1,5 @@
-﻿using PlannerApi.Models;
+﻿using Microsoft.Graph;
+using PlannerApi.Models;
 using System;
 using System.Collections.Generic;
 
@@ -6,12 +7,12 @@ namespace PlannerApi.Utils
 {
     public static class Extensions
     {
-        public static Plan[][] GetPlans(this WorkbookTableRowsResponse workbookTableRowsResponse) {
+        public static Plan[][] GetPlans(this IWorkbookTableRowsCollectionPage workbookTableRowsResponse) {
             List<Plan> plans = new List<Plan>();
             List<Plan> shortPlans = new List<Plan>();
             List<Plan> midPlans = new List<Plan>();
             List<Plan> longPlans = new List<Plan>();
-            foreach (var row in workbookTableRowsResponse.Rows) {
+            foreach (var row in workbookTableRowsResponse) {
                 string planName = row.Values[0][0].ToString();
                 if(string.IsNullOrEmpty(planName)) {
                     break;

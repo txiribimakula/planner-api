@@ -19,16 +19,13 @@
 
         [HttpGet("plans")]
         public async Task<Plan[][]> GetPlans() {
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(baseAddress);
-            client.DefaultRequestHeaders.Authorization = Auth.GetAuthHeader(Request.Headers);
+            GraphServiceClient graphClient = new GraphServiceClient(new AuthenticationProvider(Auth.GetAuthHeader(Request.Headers)));
 
-            var response = await client.GetAsync("drive/items/EB4D21CF97FBA497!11746/workbook/tables/plans/rows");
-            var responseContent = await response.Content.ReadAsStringAsync();
+            var plansResponse = await graphClient.Me.Drive.Items["EB4D21CF97FBA497!11746"].Workbook.Tables["plans"].Rows
+                .Request()
+                .GetAsync();
 
-            WorkbookTableRowsResponse rowsResponse = JsonConvert.DeserializeObject<WorkbookTableRowsResponse>(responseContent);
-
-            return rowsResponse.GetPlans();
+            return plansResponse.GetPlans();
         }
 
         [HttpPost("plans")]
