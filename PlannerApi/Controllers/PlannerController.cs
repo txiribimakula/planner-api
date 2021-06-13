@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Graph;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using PlannerApi.Models;
     using PlannerApi.Utils;
@@ -74,19 +73,20 @@
                         || !Array.Find(plans[1], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[1][i])
                         || !Array.Find(plans[2], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[2][i])
                         || !Array.Find(plans[3], plan => plan.Title == plans[0][i].Title).Equals(currentListsOfPlans[3][i])) {
-                        var serialized = JsonConvert.SerializeObject(
-                        new object[][] {
-                            new object [] {
-                                plans[0][i].Title,
-                                Array.Find(plans[1], shortPlan => shortPlan.Title == plans[0][i].Title).Index,
-                                Array.Find(plans[2], midPlan => midPlan.Title == plans[0][i].Title).Index,
-                                Array.Find(plans[3], longPlan => longPlan.Title == plans[0][i].Title).Index
-                            } });
-                        var patchRequestContent = new StringContent(serialized);
+                        var values = JToken.FromObject(
+                            new object[][] {
+                                new object [] {
+                                    plans[0][i].Title,
+                                    Array.Find(plans[1], shortPlan => shortPlan.Title == plans[0][i].Title).Index,
+                                    Array.Find(plans[2], midPlan => midPlan.Title == plans[0][i].Title).Index,
+                                    Array.Find(plans[3], longPlan => longPlan.Title == plans[0][i].Title).Index
+                                }
+                            }
+                        );
 
                         await graphClient.Me.Drive.Items["EB4D21CF97FBA497!11746"].Workbook.Tables["plans"].Rows[$"ItemAt(index={i})"]
                             .Request()
-                            .UpdateAsync(new WorkbookTableRow() { Values = JToken.Parse(serialized) });
+                            .UpdateAsync(new WorkbookTableRow() { Values = values });
                     }
                 }
             }
