@@ -31,10 +31,10 @@ namespace PlannerApi.Utils
             return listsOfPlans;
         }
 
-        public static IEnumerable<Models.Event> GetEvents(this IUserEventsCollectionPage userEventsCollectionPage) {
+        public static IEnumerable<Models.Event> GetEvents(this IEnumerable<Microsoft.Graph.Event> eventsResponse) {
             var events = new List<Models.Event>();
 
-            foreach (var item in userEventsCollectionPage) {
+            foreach (var item in eventsResponse) {
                 events.Add(new Models.Event() {
                     Id = item.Id,
                     Title = item.Subject,
