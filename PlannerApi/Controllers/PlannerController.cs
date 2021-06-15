@@ -101,10 +101,15 @@
 
         [HttpGet("events")]
         public async Task<IEnumerable<Models.Event>> GetEvents() {
+            var startDateTime = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek);
+            startDateTime = startDateTime.AddMinutes(-(startDateTime.Hour * 60 + startDateTime.Minute));
+            var endDateTime = startDateTime.AddDays((int)System.DayOfWeek.Saturday);
+            endDateTime = endDateTime.AddMinutes(23 * 60 + 59);
+
             var queryOptions = new List<QueryOption>()
             {
-                new QueryOption("startdatetime", "2021-06-14T04:14:08Z"),
-                new QueryOption("enddatetime", "2021-06-20T04:14:08Z")
+                new QueryOption("startdatetime", startDateTime.ToString()),
+                new QueryOption("enddatetime", endDateTime.ToString())
             };
 
             var eventsResponse = await GraphServiceClient.Me.CalendarView
