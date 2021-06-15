@@ -101,8 +101,14 @@
 
         [HttpGet("events")]
         public async Task<IEnumerable<Models.Event>> GetEvents() {
-            var eventsResponse = await GraphServiceClient.Me.Events
-                .Request()
+            var queryOptions = new List<QueryOption>()
+            {
+                new QueryOption("startdatetime", "2021-06-14T04:14:08Z"),
+                new QueryOption("enddatetime", "2021-06-20T04:14:08Z")
+            };
+
+            var eventsResponse = await GraphServiceClient.Me.CalendarView
+                .Request(queryOptions)
                 .GetAsync();
 
             return eventsResponse.GetEvents();
