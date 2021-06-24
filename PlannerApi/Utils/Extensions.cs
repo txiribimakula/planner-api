@@ -47,6 +47,23 @@ namespace PlannerApi.Utils
             return events;
         }
 
+        public static Microsoft.Graph.Event GetEvent(this Models.Event @event) {
+            return new Microsoft.Graph.Event {
+                Subject = @event.Title,
+                Start = new DateTimeTimeZone {
+                    DateTime = @event.StartDate.GetString(),
+                    TimeZone = "UTC"
+                },
+                End = new DateTimeTimeZone {
+                    DateTime = @event.EndDate.GetString(),
+                    TimeZone = "UTC"
+                },
+                Categories = new List<string> { 
+                    @event.PlanTitle
+                }
+            };
+        }
+
         public static DateTime GetDateTime(this string dateTimeText) {
             var startDateTime = dateTimeText.Split('T');
             var startDate = startDateTime[0];
@@ -55,6 +72,16 @@ namespace PlannerApi.Utils
             var startTimeSplitted = startTime.Split(':');
 
             return new DateTime(int.Parse(startDateSplitted[0]), int.Parse(startDateSplitted[1]), int.Parse(startDateSplitted[2]), int.Parse(startTimeSplitted[0]), int.Parse(startTimeSplitted[1]), 0);
+        }
+
+        public static string GetString(this DateTime dateTime) {
+            var year = dateTime.Year;
+            var month = dateTime.Month.ToString("00");
+            var day = dateTime.Day.ToString("00");
+            var hour = dateTime.Hour.ToString("00");
+            var minute = dateTime.Minute.ToString("00");
+            
+            return $"{year}-{month}-{day}T{hour}:{minute}";
         }
     }
 }
