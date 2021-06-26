@@ -12,7 +12,8 @@
 
     [Route("api/[controller]")]
     [ApiController]
-    public class PlannerController : ControllerBase {
+    public class PlannerController : ControllerBase
+    {
         private readonly string FileId = "EB4D21CF97FBA497!11746";
         private readonly string PlansTableName = "plans";
 
@@ -122,6 +123,15 @@
             await GraphServiceClient.Me.Events
                 .Request()
                 .AddAsync(@event.GetEvent());
+
+            return await GetEvents();
+        }
+
+        [HttpDelete("event/{id}")]
+        public async Task<IEnumerable<Models.Event>> DeletePlan(string id) {
+            await GraphServiceClient.Me.Events[id]
+                .Request()
+                .DeleteAsync();
 
             return await GetEvents();
         }
