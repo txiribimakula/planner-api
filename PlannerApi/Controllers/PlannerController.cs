@@ -112,7 +112,7 @@
             };
 
             var eventsResponse = await GraphServiceClient.Me.CalendarView
-                .Request(queryOptions)
+                .Request(queryOptions).Top(1000)
                 .GetAsync();
 
             return eventsResponse.GetEvents();
