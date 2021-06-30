@@ -71,7 +71,7 @@ namespace PlannerApi.Utils
             var startTime = startDateTime[1];
             var startTimeSplitted = startTime.Split(':');
 
-            return new DateTime(int.Parse(startDateSplitted[0]), int.Parse(startDateSplitted[1]), int.Parse(startDateSplitted[2]), int.Parse(startTimeSplitted[0]), int.Parse(startTimeSplitted[1]), 0);
+            return new DateTime(int.Parse(startDateSplitted[0]), int.Parse(startDateSplitted[1]), int.Parse(startDateSplitted[2]), int.Parse(startTimeSplitted[0]) + 2, int.Parse(startTimeSplitted[1]), 0);
         }
 
         public static string GetString(this DateTime dateTime) {
