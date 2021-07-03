@@ -99,16 +99,11 @@
         }
 
         [HttpGet("events")]
-        public async Task<IEnumerable<Models.Event>> GetEvents() {
-            var startDateTime = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek);
-            startDateTime = startDateTime.AddMinutes(-(startDateTime.Hour * 60 + startDateTime.Minute));
-            var endDateTime = startDateTime.AddDays((int)System.DayOfWeek.Saturday);
-            endDateTime = endDateTime.AddMinutes(23 * 60 + 59);
-
+        public async Task<IEnumerable<Models.Event>> GetEvents([FromQuery(Name = "startPeriod")] DateTime startPeriod, [FromQuery(Name = "endPeriod")] DateTime endPeriod) {
             var queryOptions = new List<QueryOption>()
             {
-                new QueryOption("startdatetime", startDateTime.ToString()),
-                new QueryOption("enddatetime", endDateTime.ToString())
+                new QueryOption("startdatetime", startPeriod.ToString()),
+                new QueryOption("enddatetime", endPeriod.ToString())
             };
 
             var eventsResponse = await GraphServiceClient.Me.CalendarView
@@ -124,7 +119,7 @@
                 .Request()
                 .AddAsync(@event.GetEvent());
 
-            return await GetEvents();
+            return new List<Models.Event>();
         }
 
         [HttpDelete("event/{id}")]
@@ -133,7 +128,7 @@
                 .Request()
                 .DeleteAsync();
 
-            return await GetEvents();
+            return new List<Models.Event>();
         }
     }
 }
