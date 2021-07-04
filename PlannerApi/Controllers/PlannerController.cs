@@ -98,6 +98,26 @@
             return await GetPlans();
         }
 
+        [HttpGet("events/currentweek")]
+        public async Task<IEnumerable<Models.Event>> GetCurrentWeekEvents() {
+            var startDateTime = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek);
+            startDateTime = startDateTime.AddMinutes(-(startDateTime.Hour * 60 + startDateTime.Minute));
+            var endDateTime = startDateTime.AddDays((int)System.DayOfWeek.Saturday);
+            endDateTime = endDateTime.AddMinutes(23 * 60 + 59);
+
+            var queryOptions = new List<QueryOption>()
+            {
+                new QueryOption("startdatetime", startDateTime.ToString()),
+                new QueryOption("enddatetime", endDateTime.ToString())
+            };
+
+            var eventsResponse = await GraphServiceClient.Me.CalendarView
+                .Request(queryOptions).Top(1000)
+                .GetAsync();
+
+            return eventsResponse.GetEvents();
+        }
+
         [HttpGet("events")]
         public async Task<IEnumerable<Models.Event>> GetEvents([FromQuery(Name = "startPeriod")] DateTime startPeriod, [FromQuery(Name = "endPeriod")] DateTime endPeriod) {
             var queryOptions = new List<QueryOption>()
@@ -119,7 +139,7 @@
                 .Request()
                 .AddAsync(@event.GetEvent());
 
-            return new List<Models.Event>();
+            return await GetCurrentWeekEvents();
         }
 
         [HttpDelete("event/{id}")]
@@ -128,7 +148,7 @@
                 .Request()
                 .DeleteAsync();
 
-            return new List<Models.Event>();
+            return await GetCurrentWeekEvents();
         }
     }
 }
