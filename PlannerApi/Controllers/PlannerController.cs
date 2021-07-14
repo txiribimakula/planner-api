@@ -8,6 +8,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     [Route("api/[controller]")]
@@ -94,6 +95,8 @@
                     }
                 }
             }
+
+            Thread.Sleep(3000);
 
             return await GetPlans();
         }
